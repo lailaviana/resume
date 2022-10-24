@@ -1,0 +1,151 @@
+---
+title: ""
+format: 
+  html:
+    theme: journal
+    css: custom2.css
+editor: visual
+knitr:
+  opts_chunk: 
+    echo: false
+    message: false
+    warning: false
+---
+
+```{r}
+#| include: false
+#| cache: false
+googlesheets4::gs4_deauth()
+cv_url <- "https://docs.google.com/spreadsheets/d/1d9JTogexP-g_WCEqoQV3H2ZHHrenUWqRmmN4l0JEiRA/edit?usp=sharing"
+cv <- googlesheets4::read_sheet(cv_url)
+```
+
+<!-- Sidebar -->
+
+::: columns
+::: {.column .aside width="25%"}
+<center><a href='' target='_blank'> ![](https://avatars.githubusercontent.com/u/89318961?s=400&u=10abb055dea5b8f63b35145cc3aa13098b4210ba&v=4){width="80%" style="border-radius: 50%;"}</center>
+
+</a>
+
+### Contact
+
+<center><span style="font-size: 1.5em;"> <a href='https://www.researchgate.net/profile/Laila-Viana-Almeida' target='_blank'><i class="fa-brands fa-researchgate"></i></a> <a href='mailto:lailavalmeida@gmail.com'><i class="fa fa-envelope"></i></a> <a href='https://www.linkedin.com/in/lailaviana/' target='_blank'><i class="fa-brands fa-linkedin"></i></a> <a href='https://github.com/lailaviana' target='_blank'><i class="fa-brands fa-github"></i></a></center>
+
+</span>
+
+Hi, my name is Laila Viana and I'm a biologist working with TryTrips since 2013. I have experience in molecular biology and bioinformatics. I am currently working with DNA and RNA sequencing analysis, trying to understand what makes *T. cruzi* capable of invading different cell types.
+
+### Languages
+
+**Portuguese:** Native <br> **English:** Advanced <br>
+
+### Awards
+
+<i class="far fa-star"></i> Academic Relevance (UFMG) - 2014/2015
+
+<i class="far fa-star"></i> Zigman Brener Award (SBPz) - 2015
+
+<i class="far fa-star"></i> Walter Colli Award (SBPz) - 2016/2018 (Co-author)
+
+<i class="far fa-star"></i> Honorable Mention (X-meeting) - 2016 (Co-author)
+
+### Programming skills
+
+<i class="fas fa-laptop"></i> Bash <br><i class="fab fa-r-project"></i> R <br> <i class="fa fa-area-chart" aria-hidden="true"></i> tidyverse <br> <i class="fab fa-markdown"></i> RMarkdown / Quarto <br> <i class="fas fa-code-branch"></i> Git <br> <i class="fab fa-github"></i> GitHub
+:::
+
+::: {.column width="5%"}
+:::
+
+::: {.column width="70%"}
+<!-- Functions -->
+
+```{r}
+col_br <- function(col){
+    dplyr::if_else(
+      !is.na(col) & col != "N/A|NA", 
+      paste0(col, ""),
+      ""
+    )
+}
+col_br_loc <- function(col){
+    dplyr::if_else(
+      !is.na(col) & col != "N/A|NA", 
+      paste0('<br><i class="fa-solid fa-location-dot"></i> ', col),
+      ""
+    )
+}
+create_section <- function(cv_data, section_name){
+  cv_data |>
+    dplyr::mutate(in_resume = as.character(in_resume),
+                  end = tidyr::replace_na(end, 9999),
+                  loc = dplyr::if_else(loc == "Online", NA_character_, loc)) |>
+    dplyr::filter(in_resume %in% c("TRUE", "VERDADEIRO"), section == section_name) |>
+    dplyr::select(section:description_1) |>
+    dplyr::arrange(desc(end), desc(start)) |>
+    dplyr::mutate(
+      date =
+        dplyr::case_when(
+          end == 9999 ~ glue::glue("Current <br> | <br> {start}"),
+          end != start ~ glue::glue("{end} <br> | <br> {start}"),
+          end == start ~ glue::glue("{end}"),
+          TRUE ~ ""
+        ) ,
+      .before = everything()
+    ) |>
+    dplyr::mutate(
+      main_text =
+        glue::glue(
+          "**{title}** <br> {col_br(institution)} {col_br(description_1)} {col_br_loc(loc)}"),
+      .after = date
+    ) |>
+    dplyr::select(-c(start, end, section, title, institution, loc, description_1)) |>
+    gt::gt() |>
+    gt::fmt_markdown(columns = c(date, main_text)) |> 
+    gt::tab_options(column_labels.hidden = TRUE, table.width = gt::pct(100)) |> 
+    gt::cols_align(align = "left", columns = main_text)
+}
+```
+
+<!-- Main content -->
+
+# Laila Viana de Almeida
+
+## <i class="fa-solid fa-graduation-cap"></i> Education
+
+```{r}
+create_section(cv, "education")
+```
+
+## <i class="fa-solid fa-flask-vial"></i> Lab Skills
+
+```{r}
+create_section(cv, "lab_skills")
+```
+
+## <i class="fa-solid fa-newspaper"></i> Publications
+
+```{r}
+create_section(cv, "publications_journals")
+```
+
+## <i class="fa-solid fa-chalkboard-user"></i> Short Courses
+
+```{r}
+create_section(cv, "short_courses")
+```
+:::
+:::
+
+<!-- footer -->
+
+<p class="footer">
+
+Resume made with [Quarto](https://quarto.org/). Last updated on `r format.Date(Sys.Date(), "%b %d, %Y")`. <br>License: [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0/).
+
+</p>
+
+```{=html}
+<script src="https://kit.fontawesome.com/1bb720cc6f.js" crossorigin="anonymous"></script>
+```

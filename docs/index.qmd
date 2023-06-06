@@ -23,7 +23,7 @@ cv <- googlesheets4::read_sheet(cv_url)
 <!-- Sidebar -->
 
 ::: columns
-::: {.column .aside width="25%"}
+::: {.column width="25%"}
 <center><a href='' target='_blank'> ![](https://avatars.githubusercontent.com/u/89318961?s=400&u=10abb055dea5b8f63b35145cc3aa13098b4210ba&v=4){width="80%" style="border-radius: 50%;"}</center>
 
 </a>
